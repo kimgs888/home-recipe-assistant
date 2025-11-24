@@ -8,18 +8,12 @@ const error = ref(null)
 
 onMounted(async () => {
   try {
-    // 백엔드 헬스 체크
     const healthRes = await fetch('http://localhost:8000/health')
-    if (!healthRes.ok) {
-      throw new Error('Health check failed')
-    }
+    if (!healthRes.ok) throw new Error('health failed')
     health.value = await healthRes.json()
 
-    // 재료 목록 호출
     const ingRes = await fetch('http://localhost:8000/ingredients')
-    if (!ingRes.ok) {
-      throw new Error('Failed to fetch ingredients')
-    }
+    if (!ingRes.ok) throw new Error('ingredients failed')
     ingredients.value = await ingRes.json()
   } catch (e) {
     console.error(e)
@@ -44,7 +38,7 @@ onMounted(async () => {
     </section>
 
     <section style="margin-top: 24px;">
-      <h2>Ingredients (Mock Data)</h2>
+      <h2>Ingredients (Mock)</h2>
       <ul v-if="ingredients.length">
         <li v-for="item in ingredients" :key="item.id">
           {{ item.name }} - {{ item.amount }}{{ item.unit }}
@@ -54,9 +48,3 @@ onMounted(async () => {
     </section>
   </main>
 </template>
-
-<style>
-body {
-  margin: 0;
-}
-</style>
