@@ -1,50 +1,50 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from "vue";
+import apiClient from "./api/client";
 
-const health = ref(null)
-const ingredients = ref([])
-const loading = ref(true)
-const error = ref(null)
+const pingMessage = ref("Loading...");
+const errorMessage = ref("");
 
 onMounted(async () => {
   try {
-    const healthRes = await fetch('http://localhost:8000/health')
-    if (!healthRes.ok) throw new Error('health failed')
-    health.value = await healthRes.json()
-
-    const ingRes = await fetch('http://localhost:8000/ingredients')
-    if (!ingRes.ok) throw new Error('ingredients failed')
-    ingredients.value = await ingRes.json()
-  } catch (e) {
-    console.error(e)
-    error.value = e.message
-  } finally {
-    loading.value = false
+    const res = await apiClient.get("/ping");
+    // FastAPI에서 {"message": "pong"} 반환
+    pingMessage.value = res.data.message;
+  } catch (err) {
+    console.error(err);
+    errorMessage.value = "백엔드 서버에 연결할 수 없습니다.";
   }
-})
+});
 </script>
 
 <template>
-  <main style="padding: 24px; font-family: system-ui, -apple-system, BlinkMacSystemFont;">
-    <h1>Home Recipe Assistant</h1>
+  <main>
+    <h1>Home Recipe Assistant – DAY2</h1>
 
-    <section style="margin-top: 16px;">
-      <h2>Backend Health</h2>
-      <div v-if="loading">로딩 중...</div>
-      <div v-else-if="error">
-        <strong style="color: red;">에러:</strong> {{ error }}
-      </div>
-      <pre v-else>{{ health }}</pre>
-    </section>
-
-    <section style="margin-top: 24px;">
-      <h2>Ingredients (Mock)</h2>
-      <ul v-if="ingredients.length">
-        <li v-for="item in ingredients" :key="item.id">
-          {{ item.name }} - {{ item.amount }}{{ item.unit }}
-        </li>
-      </ul>
-      <p v-else>재료 데이터가 없습니다.</p>
+    <section>
+      <h2>백엔드 통신 상태</h2>
+      <p>Ping 결과: {{ pingMessage }}</p>
+      <p v-if="errorMessage" style="color: red">
+        {{ errorMessage }}
+      </p>
     </section>
   </main>
 </template>
+
+<style scoped>
+main {
+  padding: 2rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+</style>

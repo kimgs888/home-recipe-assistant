@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers import ping, recipes
+
 app = FastAPI(title="Home Recipe Assistant API")
 
-# 프론트 개발 서버(origin) 허용
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -18,15 +19,9 @@ app.add_middleware(
 )
 
 
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+app.include_router(ping.router)
+app.include_router(recipes.router)
 
-
-@app.get("/ingredients")
-def get_ingredients():
-    # Day1: 아직 DB 없으니까 더미 데이터로 응답
-    return [
-        {"id": 1, "name": "양파", "amount": 3, "unit": "개"},
-        {"id": 2, "name": "닭가슴살", "amount": 500, "unit": "g"},
-    ]
+@app.get("/")
+def read_root():
+    return {"message": "Home Recipe Assistant API - DAY2"}
